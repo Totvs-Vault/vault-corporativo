@@ -3,7 +3,7 @@ import * as Plugin from "./quartz/plugins"
 
 /**
  * Quartz 4.0 Configuration
- */
+ **/
 const config: QuartzConfig = {
   configuration: {
     pageTitle: "Vault Corporativo",

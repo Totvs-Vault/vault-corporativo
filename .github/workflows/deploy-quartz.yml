@@ -1,11 +1,16 @@
 name: 2. Deploy Quartz Site
 
 on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["1. Vault Auto-Convert & Sync"]
+    types:
+      - completed
   push:
     branches: ["main"]
     paths:
       - 'site/content/**'
-
+      
 permissions:
   contents: read
   pages: write

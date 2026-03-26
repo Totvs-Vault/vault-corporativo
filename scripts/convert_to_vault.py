@@ -1,40 +1,62 @@
 import os
-import frontmatter
-from datetime import datetime
 import shutil
+from pypdf import PdfReader
+import docx
 
-# Configuração de caminhos
-INPUT_DIR = "./input_docs"
-OUTPUT_DIR = "./content"
-SITE_DIR = "./site/content"
+INPUT_DIR = "input_docs"
+OUTPUT_DIR = "site/content"
 
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-os.makedirs(SITE_DIR, exist_ok=True)
+def process_files():
+    # Garante que a pasta de destino existe
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
 
-def process_markdowns():
-    # Pega todos os arquivos da pasta de input
+    # Lê tudo o que você jogou na gaveta de entrada
     for filename in os.listdir(INPUT_DIR):
-        if filename.endswith(".md"):
-            input_path = os.path.join(INPUT_DIR, filename)
-            output_path = os.path.join(OUTPUT_DIR, filename)
-            site_path = os.path.join(SITE_DIR, filename)
+        input_path = os.path.join(INPUT_DIR, filename)
+        
+        if not os.path.isfile(input_path):
+            continue
             
-            # Carrega o arquivo
-            with open(input_path, 'r', encoding='utf-8') as f:
-                post = frontmatter.load(f)
-            
-            # Injeta a Governança
-            post['status'] = 'oficial'
-            post['owner'] = 'Equipe Vault'
-            post['last_updated'] = datetime.now().strftime("%Y-%m-%d")
-            
-            # Salva na pasta content oficial
-            with open(output_path, 'w', encoding='utf-8') as f:
-                f.write(frontmatter.dumps(post))
+        name, ext = os.path.splitext(filename)
+        ext = ext.lower()
+        output_path = os.path.join(OUTPUT_DIR, f"{name}.md")
+
+        try:
+            if ext == '.md':
+                # Se já for Markdown, só copia
+                shutil.copy2(input_path, output_path)
+                print(f"Copiado direto: {filename}")
                 
-            # Copia para a pasta do site (Quartz)
-            shutil.copy2(output_path, site_path)
-            print(f"✅ Processado e enviado para o site: {filename}")
+            elif ext == '.pdf':
+                # Se for PDF, extrai o texto página por página
+                reader = PdfReader(input_path)
+                text = f"# {name}\n\n" # Cria o título principal da página
+                for page in reader.pages:
+                    extracted = page.extract_text()
+                    if extracted:
+                        text += extracted + "\n\n"
+                
+                with open(output_path, "w", encoding="utf-8") as f:
+                    f.write(text)
+                print(f"Convertido de PDF: {filename}")
+                
+            elif ext == '.docx':
+                # Se for Word, extrai o texto parágrafo por parágrafo
+                doc = docx.Document(input_path)
+                text = f"# {name}\n\n" # Cria o título principal da página
+                for para in doc.paragraphs:
+                    text += para.text + "\n\n"
+                    
+                with open(output_path, "w", encoding="utf-8") as f:
+                    f.write(text)
+                print(f"Convertido de DOCX: {filename}")
+                
+            else:
+                print(f"Formato ignorado (apenas MD, PDF e DOCX): {filename}")
+                
+        except Exception as e:
+            print(f"Erro ao processar {filename}: {e}")
 
 if __name__ == "__main__":
-    process_markdowns()
+    process_files()

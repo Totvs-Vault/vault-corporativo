@@ -1,5 +1,6 @@
 import os
 import glob
+import unicodedata
 from google import genai
 from google.genai import types
 from pinecone import Pinecone
@@ -27,6 +28,12 @@ def chunk_text(text, max_chars=1000):
         chunks.append(current_chunk.strip())
     return chunks
 
+def sanitize_id(text):
+    """Remove acentos e caracteres especiais para o Pinecone aceitar o ID"""
+    texto_sem_acento = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode('utf-8')
+    # Substitui espaços por hifens só por segurança extra
+    return texto_sem_acento.replace(' ', '-')
+
 def sync_to_vector_db():
     md_files = glob.glob(f"{CONTENT_DIR}/*.md")
     
@@ -39,26 +46,32 @@ def sync_to_vector_db():
         chunks = chunk_text(text)
         vectors = []
         
+        # Cria um nome seguro (sem acento) para usar como ID
+        safe_filename = sanitize_id(filename)
+        
         for i, chunk in enumerate(chunks):
             if not chunk.strip(): continue
             
-            # 2. O Novo Motor Oficial de 2026 (Força Total de 3072!)
+            # O Novo Motor Oficial
             response = client.models.embed_content(
                 model='gemini-embedding-001',
                 contents=chunk,
                 config=types.EmbedContentConfig(
                     task_type="RETRIEVAL_DOCUMENT",
-                    output_dimensionality=3072 # Encaixa perfeito na sua gaveta de 3072!
+                    output_dimensionality=3072 
                 )
             )
             
             # Extrai os números
             embedding_values = response.embeddings[0].values
             
-            chunk_id = f"{filename}-chunk-{i}"
+            # Usa o nome limpo para o crachá!
+            chunk_id = f"{safe_filename}-chunk-{i}"
+            
             vectors.append({
                 "id": chunk_id, 
                 "values": embedding_values, 
+                # Mas mantém o nome original (com acento) guardado no metadata
                 "metadata": {"source": filename, "text": chunk, "status": "oficial"}
             })
             

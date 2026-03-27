@@ -6,7 +6,7 @@ import * as Plugin from "./quartz/plugins"
  **/
 const config: QuartzConfig = {
   configuration: {
-    pageTitle: "Vault Corporativo",
+    pageTitle: "Vault Corporativo BSO Datasul",
     enableSPA: true,
     enablePopovers: true,
     analytics: {
@@ -26,26 +26,26 @@ const config: QuartzConfig = {
       },
       colors: {
         lightMode: {
-          light: "#faf8f8",
-          lightgray: "#e5e5e5",
+          light: "#ffffff", // Fundo branco limpo
+          lightgray: "#f0f0f0", // Bordas suaves
           gray: "#b8b8b8",
-          darkgray: "#4e4e4e",
-          dark: "#2b2b2b",
-          secondary: "#284b63",
-          tertiary: "#84a59d",
-          highlight: "rgba(143, 159, 169, 0.15)",
-          textHighlight: "#fff23688",
+          darkgray: "#4e4e4e", // Texto principal
+          dark: "#1a1a1a", // Títulos fortes
+          secondary: "#00B2A9", // Ciano TOTVS (Cor principal)
+          tertiary: "#00857D", // Ciano Escuro (Cor do hover)
+          highlight: "rgba(0, 178, 169, 0.10)", // Fundo de destaque suave
+          textHighlight: "rgba(0, 178, 169, 0.25)",
         },
         darkMode: {
-          light: "#161618",
-          lightgray: "#393639",
+          light: "#161618", // Fundo escuro elegante (não 100% preto)
+          lightgray: "#393639", // Bordas no modo escuro
           gray: "#646464",
-          darkgray: "#d4d4d4",
-          dark: "#ebebec",
-          secondary: "#7b97aa",
-          tertiary: "#84a59d",
-          highlight: "rgba(143, 159, 169, 0.15)",
-          textHighlight: "#b3aa0288",
+          darkgray: "#d4d4d4", // Texto principal claro
+          dark: "#ebebec", // Títulos brancos
+          secondary: "#00D4C9", // Ciano TOTVS mais brilhante para dar contraste
+          tertiary: "#00B2A9", // Ciano padrão no hover
+          highlight: "rgba(0, 212, 201, 0.15)",
+          textHighlight: "rgba(0, 212, 201, 0.25)",
         },
       },
     },

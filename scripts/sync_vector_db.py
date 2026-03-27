@@ -44,7 +44,7 @@ def sync_to_vector_db():
             
             # Cria o vetor com o Gemini
             response = genai.embed_content(
-                model="models/text-embedding-004",
+                model="models/embedding-001",
                 content=chunk,
                 task_type="retrieval_document"
             )

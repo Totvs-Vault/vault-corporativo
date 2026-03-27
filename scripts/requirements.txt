@@ -1,4 +1,4 @@
-google-generativeai
+google-genai
 pinecone-client==5.0.1
 python-frontmatter==1.1.0
 pypandoc==1.13

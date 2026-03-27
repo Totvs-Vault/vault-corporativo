@@ -1,14 +1,13 @@
 import os
 import glob
-import google.generativeai as genai
+from google import genai
 from pinecone import Pinecone
 
-# Puxa as senhas do GitHub Secrets (Usando as suas chaves originais!)
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+# 1. Conecta usando a NOVA biblioteca do Google
+client = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 pc = Pinecone(api_key=os.environ["VECTOR_DB_API_KEY"])
 index = pc.Index("vault-index") 
 
-# Caminho corrigido para onde estão os seus arquivos agora
 CONTENT_DIR = "site/content" 
 
 def chunk_text(text, max_chars=1000):
@@ -42,17 +41,19 @@ def sync_to_vector_db():
         for i, chunk in enumerate(chunks):
             if not chunk.strip(): continue
             
-            # Cria o vetor com o Gemini
-            response = genai.embed_content(
-                model="models/embedding-001",
-                content=chunk,
-                task_type="retrieval_document"
+            # 2. Usa o motor oficial atual com a sintaxe nova
+            response = client.models.embed_content(
+                model='text-embedding-004',
+                contents=chunk,
             )
+            
+            # Extrai os 768 números
+            embedding_values = response.embeddings[0].values
             
             chunk_id = f"{filename}-chunk-{i}"
             vectors.append({
                 "id": chunk_id, 
-                "values": response['embedding'], 
+                "values": embedding_values, 
                 "metadata": {"source": filename, "text": chunk, "status": "oficial"}
             })
             
@@ -65,4 +66,4 @@ def sync_to_vector_db():
         print(f"🧠 Sincronizado com IA (em fatias): {filename}")
 
 if __name__ == "__main__":
-    sync_to_vector_db() 
+    sync_to_vector_db()

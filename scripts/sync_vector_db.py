@@ -65,4 +65,4 @@ def sync_to_vector_db():
         print(f"🧠 Sincronizado com IA (em fatias): {filename}")
 
 if __name__ == "__main__":
-    sync_to_vector_db()
+    sync_to_vector_db() 
